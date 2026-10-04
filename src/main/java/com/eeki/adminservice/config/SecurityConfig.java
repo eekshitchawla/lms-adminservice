@@ -73,7 +73,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/send-otp",
-                                "/api/v1/auth/request-otp", "/api/v1/auth/verify-otp", "/api/v1/health").permitAll()
+                                "/api/v1/auth/request-otp", "/api/v1/auth/verify-otp", "/api/v1/health",
+                                "/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
