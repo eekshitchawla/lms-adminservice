@@ -8,6 +8,7 @@ import com.eeki.adminservice.entity.User;
 import com.eeki.adminservice.entity.UserRole;
 import com.eeki.adminservice.repository.AdminStatsRepository;
 import com.eeki.adminservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +24,12 @@ public class AdminService {
     private final AdminStatsRepository adminStatsRepository;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+
+    @Value("${CATALOG_SERVICE_BASE_URL:http://localhost:8081/api/v1}")
+    private String catalogServiceBaseUrl;
+
+    @Value("${TASK_SERVICE_URL:http://localhost:8080/api/v1/tasks}")
+    private String taskServiceUrl;
 
     public AdminService(AdminStatsRepository adminStatsRepository,
                         UserRepository userRepository,
@@ -40,7 +47,7 @@ public class AdminService {
         // Call Catalog Service to enroll user in course
         try {
             // Use the catalog service's enroll endpoint
-            String catalogServiceUrl = "http://localhost:8081/api/v1/courses/" + request.getCourseId() + "/enroll";
+            String catalogServiceUrl = catalogServiceBaseUrl + "/courses/" + request.getCourseId() + "/enroll";
             
             // Create enroll request payload
             Map<String, Object> enrollPayload = new HashMap<>();
@@ -60,7 +67,7 @@ public class AdminService {
     @Transactional
     public String updateCourseContent(UpdateCourseContentRequest request) {
         try {
-            String catalogServiceUrl = "http://localhost:8081/api/v1/courses/" + request.getCourseId();
+            String catalogServiceUrl = catalogServiceBaseUrl + "/courses/" + request.getCourseId();
             // This would be the actual call to the catalog service
             System.out.println("Updating course: " + request.getCourseId());
         } catch (Exception e) {
@@ -113,7 +120,7 @@ public class AdminService {
     private long getTotalTasksAssigned() {
         try {
             // Call the LMS service to get total tasks
-            String response = restTemplate.getForObject("http://localhost:8080/api/v1/tasks", String.class);
+            String response = restTemplate.getForObject(taskServiceUrl, String.class);
             // Parse and count from response
             return 0L; // Placeholder - would be calculated from actual task count
         } catch (Exception e) {
@@ -124,7 +131,7 @@ public class AdminService {
     private long getCompletedTasks() {
         try {
             // Call the LMS service to get completed tasks
-            String response = restTemplate.getForObject("http://localhost:8080/api/v1/tasks", String.class);
+            String response = restTemplate.getForObject(taskServiceUrl, String.class);
             // Parse and filter completed tasks
             return 0L; // Placeholder - would be calculated from actual completed tasks
         } catch (Exception e) {
